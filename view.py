@@ -20,7 +20,10 @@ class View():
         self.widgets_conteudo()
         self.widgets_conteudo1()
         self.widgets_Rodape()
-        
+
+        self.tabela()
+        self.select_usuario()
+
         janela.mainloop()
 
 #_________________________Tela________________________________
