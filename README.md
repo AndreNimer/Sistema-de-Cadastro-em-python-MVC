@@ -1,3 +1,3 @@
 # Sistema-de-Cadastro-em-python
 
-<img src="print.jpg">
+<img src="print.png">
