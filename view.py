@@ -1,169 +1,213 @@
-from queue import Full
 from tkinter import *
 from tkinter import ttk
-import pymongo
 
-co0 = "#545454" #cinza
+co0 = "#ffffff" #cinza
 co1 = "#d9d9d9" #cinza
 co2 = "#2c2c2c" #black
-co3 = '#ffffff' #branco
+co3 = '#000000' #branco
 co4 = "#3f7a3e" #verde-escuro
+class Produto:
+    def __init__(self, nome, preco, descricao, quantidade):
 
-janela = Tk()
-class View():
-    def __init__(self):
-        
-        self.janela = janela
+        self.nome = nome
+        self.preco = preco
+        self.descricao = descricao
+        self.quantidade = quantidade
+
+class View:
+    def __init__(self, root, controller):
+        self.root = root
+        self.controller = controller
         self.tela()
         self.frames()
-        self.widgets_Cabecalho()
         self.widgets_conteudo()
         self.widgets_conteudo1()
-        self.widgets_Rodape()
-
-        self.tabela()
-        self.select_usuario()
-
-        janela.mainloop()
-
+        
 #_________________________Tela________________________________
 
     def tela(self):
 
-        self.janela.title('')
-        self.janela.overrideredirect(True)
-        self.janela.configure(background=co1)
-        self.janela.geometry("{0}x{1}+0+0".format(janela.winfo_screenwidth(), janela.winfo_screenheight()))
-        self.janela.resizable(width=False, height=False)
+        self.root.title("Cadastro de Produtos")
+        self.root.configure(background=co0)
+        self.root.geometry('1200x600')
+        self.root.resizable(width=False, height=False)
+        
 
 #_________________________Frames________________________________
 
     def frames(self):
 
-        self.frame_cabecalho = Frame(self.janela, bg=co2)
-        self.frame_cabecalho.place(relx=0, rely=0, relwidth=1, relheight=0.15)
-        
-        self.frame_conteudo= Frame(self.janela, bg=co0)
-        self.frame_conteudo.place(relx=0, rely=0.15, relwidth=0.5, relheight=0.75)
+        self.frame_conteudo= Frame(self.root, highlightbackground= co3, highlightthickness=3, bg= co0)
+        self.frame_conteudo.place(relx=0.03, rely=0.05, relwidth=0.45, relheight=0.75)
 
-        self.frame_conteudo1= Frame(self.janela, bg=co0)
-        self.frame_conteudo1.place(relx=0.5, rely=0.15, relwidth=0.5, relheight=0.75)
-
-        self.frame_rodape = Frame(self.janela, bg=co2)
-        self.frame_rodape.place(relx=0, rely=0.9, relwidth=1, relheight=0.10)
-
-#_________________________Cabecalho________________________________
-
-    def widgets_Cabecalho(self):
-
-        self.logo = Label(self.frame_cabecalho, text='Cadastro de Produtos', anchor="center", font=('arial 20 bold'), bg=co2, fg=co3)
-        self.logo.place(relx=0.4, rely=0.3)
-
-        def Sair(): self.janela.destroy()
-
-        self.bt_sair = Button(self.frame_cabecalho, text='Sair', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command=Sair) 
-        self.bt_sair.place(relx=0.9, rely=0.4, relwidth=0.07,relheight=0.4)
-
-
+        self.frame_conteudo1= Frame(self.root, highlightbackground=co3, highlightthickness=3, bg= co0)
+        self.frame_conteudo1.place(relx=0.52, rely=0.05, relwidth=0.45, relheight=0.75)
 
 #_________________________Conteudo________________________________
 
     def widgets_conteudo(self):
 
-        #_________________________STYLE-TREEVIEW________________________________
-
-        style = ttk.Style()
-
-        style.theme_use("default")
-
-        style.configure("Treeview.Heading",background=co2,foreground=co3,padding=10, font=('arial 10 bold'))
-        style.map("Treeview.Heading", background=[('active', co4)])
+        #_________________________LABEL________________________________
         
-        style.configure("Treeview",background=co3,foreground=co2,rowheight=45)
-        style.map("Treeview",background=[('selected', co4)])
+        self.label_nome = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text='Nome do produto:')
+        self.label_nome.place(relx=0.1, rely=0.2, relwidth=0.3,relheight=0.09)
 
-        #_________________________TREEVIEW________________________________
+        self.label_preco = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text="Preço:")
+        self.label_preco.place(relx=0.1, rely=0.4, relwidth=0.3,relheight=0.09)
 
-        self.tv = ttk.Treeview(self.frame_conteudo1, height= 3 ,columns=('nome','QNT','precos', 'Descricao'),show='headings',)
+        self.label_descricao = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text="Descrição:")
+        self.label_descricao.place(relx=0.1, rely=0.6, relwidth=0.3,relheight=0.09)
         
-        self.tv.column('nome', width=100, anchor= CENTER)
-        self.tv.heading('nome',text="Nome", anchor= CENTER)
+        self.label_quantidade = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text="Quantidade:")
+        self.label_quantidade.place(relx=0.4, rely=0.4, relwidth=0.3,relheight=0.09)
 
-        self.tv.column('QNT', width=50, anchor= CENTER)
-        self.tv.heading('QNT',text="QNT", anchor= CENTER)
+        #_________________________ENTRY________________________________
+        self.entry_busca = Entry(self.frame_conteudo, font=('arial 12'), border=1, relief="solid", justify=CENTER, bg=co0, fg=co2)
+        self.entry_busca.place(relx=0.25, rely=0.1, relwidth=0.6,relheight=0.09)
 
-        self.tv.column('precos', width=50, anchor= CENTER)
-        self.tv.heading('precos',text="precos", anchor= CENTER)
+        self.entry_nome = Entry(self.frame_conteudo, font=('arial 12'), border=1, relief="solid", justify=LEFT, bg=co0, fg=co2)
+        self.entry_nome.place(relx=0.1, rely=0.3, relwidth=0.7,relheight=0.09)
 
-        self.tv.column('Descricao', width=200, anchor= CENTER)
-        self.tv.heading('Descricao',text="Descricao", anchor= CENTER)
-
-        self.tv.place(relx=0.1, rely=0.1, relwidth=0.8, relheight=0.7)
+        self.entry_preco = Entry(self.frame_conteudo, font=('arial 12'), border=1, relief="solid", justify=CENTER, bg=co0, fg=co2)
+        self.entry_preco.place(relx=0.1, rely=0.5, relwidth=0.25,relheight=0.09)
         
+        self.entry_descricao = Text(self.frame_conteudo, font=('arial 12'), border=1, relief="solid", bg=co0, fg=co2)
+        self.entry_descricao.place(relx=0.1, rely=0.7, relwidth=0.7,relheight=0.2)
         #_________________________SCROLLBAR________________________________
+         
+        self.descricao_scroll = Scrollbar(self.frame_conteudo, orient='vertical')
+        self.entry_descricao.configure(yscroll= self.descricao_scroll.set)
+        self.descricao_scroll.place(relx=0.79, rely=0.7, relwidth=0.04, relheight=0.2)
 
-        self.tv_scrol = Scrollbar(self.frame_conteudo1, orient='vertical')
-        self.tv.configure(yscroll= self.tv_scrol.set)
-        self.tv_scrol.place(relx=0.89, rely=0.1, relwidth=0.04, relheight=0.7)
+        self.entry_quantidade = Entry(self.frame_conteudo, font=('arial 12'), border=1, relief="solid", justify= CENTER, bg=co0, fg=co2)
+        self.entry_quantidade.place(relx=0.4, rely=0.5, relwidth=0.15,relheight=0.09)
 
-        self.tv.bind("<Double-1>", self.espelho)
+        #_________________________BUTTON________________________________
+        self.bt_buscar = Button(self.frame_conteudo, text='Buscar', anchor="center", font=('arial 12 bold'), bg=co3, fg=co0, border=0,activebackground=co0,activeforeground= co3, command= self.pesquisar) 
+        self.bt_buscar.place(relx=0.1, rely=0.1, relwidth=0.15,relheight=0.09)
 
-        self.bt_mostra = Button(self.frame_conteudo1, text='Mostra Tudo', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command= self.select_usuario) 
-        self.bt_mostra.place(relx=0.72, rely=0.85, relwidth=0.2,relheight=0.09)
+        self.button_cadastrar = Button(self.root, text='Adicionar', anchor="center", font=('arial 12 bold'), bg=co0, fg=co3, border=2,relief="solid",activebackground=co3,activeforeground= co0,highlightbackground= co3, command=self.cadastrar)
+        self.button_cadastrar.place(relx=0.05, rely=0.85, relwidth=0.1,relheight=0.08)
+
+        self.button_excluir = Button(self.root, text='Excluir', anchor="center", font=('arial 12 bold'), bg=co0, fg=co3, border=2,relief="solid",activebackground=co3,activeforeground= co0,highlightbackground= co3, command=self.excluir)
+        self.button_excluir.place(relx=0.20, rely=0.85, relwidth=0.1,relheight=0.08)
+
+        self.button_editar = Button(self.root, text='Editar', anchor="center", font=('arial 12 bold'), bg=co0, fg=co3, border=2,relief="solid",activebackground=co3,activeforeground= co0,highlightbackground= co3, command=self.editar)
+        self.button_editar.place(relx=0.35, rely=0.85, relwidth=0.1,relheight=0.08)
 
 #_________________________Conteudo-1________________________________
 
     def widgets_conteudo1(self):
 
-        #_________________________LABEL________________________________
+        #_________________________STYLE-TREEVIEW_______________________________
+        style = ttk.Style()
+
+        style.theme_use("default")
+
+        style.configure("Treeview.Heading",background=co3,foreground=co0,padding=10, font=('arial 10 bold'))
+        style.map("Treeview.Heading", background=[('active', co0)], foreground= [('active',co3)])
         
-        self.lb_nome = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text='Nome do produto:')
-        self.lb_nome.place(relx=0.1, rely=0.3, relwidth=0.3,relheight=0.09)
+        style.configure("Treeview",background=co0,foreground=co3,rowheight=45,)
+        style.map("Treeview",background=[('selected', co3)],foreground=[('selected', co0)])
 
-        self.lb_QNT = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text='Quantidade:')
-        self.lb_QNT.place(relx=0.43, rely=0.3, relwidth=0.3,relheight=0.09)
+        #_________________________TREEVIEW________________________________
+        self.tv = ttk.Treeview(self.frame_conteudo1, height= 3 ,columns=('id','nome','precos', 'descricao', 'QNT'),show='headings')
 
-        self.lb_preco = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text='Preço:')
-        self.lb_preco.place(relx=0.64, rely=0.3, relwidth=0.3,relheight=0.09)
+        self.tv.column('id', width=150, anchor= CENTER)
+        self.tv.heading('id',text="ID", anchor= CENTER)
 
-        self.lb_Descricao = Label(self.frame_conteudo, font=('arial 12 bold'), bg=co0, fg=co3, anchor= W, text='Descrição do produto:')
-        self.lb_Descricao.place(relx=0.1, rely=0.5, relwidth=0.3,relheight=0.09)
+        self.tv.column('nome', width=100, anchor= CENTER)
+        self.tv.heading('nome',text="Nome", anchor= CENTER)
 
-        #_________________________ENTRY________________________________
+        self.tv.column('precos', width=80, anchor= CENTER)
+        self.tv.heading('precos',text="Precos", anchor= CENTER)
 
-        self.entry_busca = Entry(self.frame_conteudo, font=('arial 12'), border=1, justify=CENTER, bg=co3, fg=co2)
-        self.entry_busca.place(relx=0.26, rely=0.1, relwidth=0.6,relheight=0.09)
+        self.tv.column('descricao', width=100, anchor= CENTER)
+        self.tv.heading('descricao',text="Descricao", anchor= CENTER)
 
-        self.entry_nome = Entry(self.frame_conteudo, font=('arial 12'), border=1, justify=CENTER, bg=co3, fg=co2)
-        self.entry_nome.place(relx=0.1, rely=0.4, relwidth=0.3,relheight=0.09)
+        self.tv.column('QNT', width=50, anchor= CENTER)
+        self.tv.heading('QNT',text="QNT", anchor= CENTER)
 
-        self.entry_QNT = Entry(self.frame_conteudo, font=('arial 12'), border=1, justify=CENTER, bg=co3, fg=co2)
-        self.entry_QNT.place(relx=0.47, rely=0.4, relwidth=0.08,relheight=0.09)
+        self.tv.place(relx=0, rely=0, relwidth=0.96, relheight=1.002)
+        
+        #_________________________SCROLLBAR________________________________
+        
+        self.tv_scrol = Scrollbar(self.frame_conteudo1, orient='vertical')
+        self.tv.configure(yscroll= self.tv_scrol.set)
+        self.tv_scrol.place(relx=0.96, rely=0, relwidth=0.04, relheight=1)
 
-        self.entry_preco = Entry(self.frame_conteudo, font=('arial 12'), border=1, justify=CENTER, bg=co3, fg=co2)
-        self.entry_preco.place(relx=0.65, rely=0.4, relwidth=0.08,relheight=0.09)
+        self.tv.bind("<<TreeviewSelect>>", self.selecionar)
+        
+#_________________________Funções________________________________
 
-        self.entry_Descricao = Entry(self.frame_conteudo, font=('arial 12'), border=1, justify= CENTER, bg=co3, fg=co2)
-        self.entry_Descricao.place(relx=0.1, rely=0.6, relwidth=0.8,relheight=0.09)
+    #_________________________Função-Treeview________________________________
 
-        #_________________________BUTTON________________________________
+    def atualizar(self, produtos): 
+        self.tv.delete(*self.tv.get_children())
+        for produto in produtos:
+            self.tv.insert("", "end", values=(produto["_id"], produto["nome"], produto["preco"], produto["quantidade"], produto["descricao"]))
+    
+    #_________________________Função-limpar________________________________
 
-        self.bt_buscar = Button(self.frame_conteudo, text='Buscar', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command= self.busca) 
-        self.bt_buscar.place(relx=0.1, rely=0.1, relwidth=0.15,relheight=0.09)
+    def limpar(self):
+
+        self.entry_nome.delete(0, END)
+        self.entry_preco.delete(0, END) 
+        self.entry_quantidade.delete(0, END)
+        self.entry_descricao.delete("1.0", END)
+
+    #_________________________Função-Selecionar________________________________   
+
+    def selecionar(self, event):
+        self.limpar()
+        self.tv.selection()
+
+        for n in self.tv.selection():
+
+            id, nome, preco, descricao, quantidade = self.tv.item(n, 'values')
+
+            self.entry_nome.insert(END, nome)
+            self.entry_preco.insert(END, preco)
+            self.entry_descricao.insert(END, descricao)
+            self.entry_quantidade.insert(END, quantidade)
+
+    #_________________________Função-Cadastrar________________________________
+
+    def cadastrar(self):
+
+        nome = self.entry_nome.get()
+        preco = float(self.entry_preco.get())
+        quantidade = int(self.entry_quantidade.get())
+        descricao = self.entry_descricao.get("1.0", "end-1c")
+        produto = Produto(nome, preco, quantidade, descricao,)
+        self.controller.adicionar_produto(produto)
+
+    #_________________________Função-Excluir________________________________
+
+    def excluir(self):
+        item_selecionado = self.tv.selection()
+        if item_selecionado:
+            nome = self.entry_nome.get()
+            self.controller.excluir(nome)
+
+    #_________________________Função-Editar________________________________
+
+    def editar(self):
+        nome = self.entry_nome.get()
+        preco = float(self.entry_preco.get())
+        quantidade = int(self.entry_quantidade.get())
+        descricao = self.entry_descricao.get("1.0", "end-1c")
+        produto = Produto(nome, preco, quantidade, descricao,)
+
+        item_selecionado = self.tv.selection()
+        if item_selecionado:
+            id = self.tv.item(item_selecionado)["text"]
+            self.controller.editar(produto)
+
+    #_________________________Função-Pesquisar________________________________
+
+    def pesquisar(self):
+        termo_pesquisa = self.entry_busca.get()
+        self.controller.pesquisar_produtos(termo_pesquisa)
 
 
-        self.bt_editar = Button(self.frame_conteudo, text='Editar', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command= self.editar) 
-        self.bt_editar.place(relx=0.1, rely=0.8, relwidth=0.15,relheight=0.09)
-
-        self.bt_adicionar = Button(self.frame_conteudo, text='Adicionar', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command= self.tabela) 
-        self.bt_adicionar.place(relx=0.27, rely=0.8, relwidth=0.15,relheight=0.09)
-
-        self.bt_excluir = Button(self.frame_conteudo, text='Excluir', anchor="center", font=('arial 12 bold'), bg=co4, fg=co3, border=0,activebackground=co2,activeforeground= co3, command=self.deletar)
-        self.bt_excluir.place(relx=0.44, rely=0.8, relwidth=0.15,relheight=0.09)
-#_________________________Rodape________________________________    
-
-    def widgets_Rodape(self):
-
-        self.contato = Label(self.frame_rodape, text='Contato: andrenimer123@gmail.com', font=('arial 12 bold'), bg=co2, fg=co3)
-        self.contato.place(relx=0.4, rely=0.3)
-View()
